@@ -1,0 +1,85 @@
+﻿<Window x:Class="TaskManager.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Менеджер задач" Height="450" Width="800">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </Window.Resources>
+
+    <Window.InputBindings>
+        <KeyBinding Key="N" Modifiers="Control" Command="{Binding AddTaskCommand}"/>
+        <KeyBinding Key="E" Modifiers="Control" Command="{Binding EditTaskCommand}"/>
+        <KeyBinding Key="D" Modifiers="Control" Command="{Binding DeleteTaskCommand}"/>
+    </Window.InputBindings>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10"
+                    Visibility="{Binding IsNotAuthenticated, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Button Command="{Binding LoginCommand}" Content="Вход" Margin="5"/>
+            <Button Command="{Binding RegisterCommand}" Content="Регистрация" Margin="5"/>
+        </StackPanel>
+
+        <Menu Grid.Row="1" Visibility="{Binding IsAuthenticated, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <MenuItem Header="Файл">
+                <MenuItem Header="Выход" Command="{Binding ExitCommand}"/>
+            </MenuItem>
+            <MenuItem Header="Задачи">
+                <MenuItem Header="Создать задачу" Command="{Binding AddTaskCommand}" InputGestureText="Ctrl+N"/>
+                <MenuItem Header="Редактировать задачу" Command="{Binding EditTaskCommand}" InputGestureText="Ctrl+E"/>
+                <MenuItem Header="Удалить задачу" Command="{Binding DeleteTaskCommand}" InputGestureText="Ctrl+D"/>
+            </MenuItem>
+            <MenuItem Header="Настройки"/>
+        </Menu>
+
+        <StackPanel Grid.Row="2" Margin="0,20,0,0" 
+                    Visibility="{Binding IsAuthenticated, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <StackPanel Orientation="Horizontal">
+                <Button Command="{Binding AddTaskCommand}" Content="Добавить задачу" Margin="5"/>
+                <Button Command="{Binding EditTaskCommand}" Content="Редактировать задачу" Margin="5"/>
+                <Button Command="{Binding DeleteTaskCommand}" Content="Удалить задачу" Margin="5"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal">
+                <Button Click="FilterAll_Click" Content="Все" Margin="5"/>
+                <Button Click="FilterInProgress_Click" Content="В работе" Margin="5"/>
+                <Button Click="FilterCompleted_Click" Content="Выполнено" Margin="5"/>
+            </StackPanel>
+
+            <TextBlock Text="Загрузка..." Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}" />
+            <ProgressBar IsIndeterminate="True" Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+            <ListView x:Name="taskListView">
+                <ListView.Resources>
+                    <Style TargetType="ListViewItem">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Status}" Value="В работе">
+                                <Setter Property="Background" Value="Yellow"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Status}" Value="Выполнено">
+                                <Setter Property="Background" Value="Green"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListView.Resources>
+
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Title}" Margin="5"/>
+                            <TextBlock Text="{Binding Description}" Margin="5"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+
+        </StackPanel>
+    </Grid>
+</Window>
